@@ -20,6 +20,9 @@
     position: relative;
     display: block;
 }
+#starter:hover{
+    box-shadow: rgba(0, 0, 0, 0.582) 0 0 20px;
+}
 
 
 #gameStart span{
@@ -66,6 +69,7 @@
     left: 0;
     top: 0;
 }
+
 .b{
     width: 18px;
     height: 9px;
