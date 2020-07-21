@@ -61,7 +61,7 @@
     gameStart.firstElementChild.onclick = function(){
         gameStart.style.display = "none";
         gameEnter.style.display = "block";
-	setTimeout(()=> instruction.style.opacity = "0" ,4000)
+
         //refresh score
         scores = 0;
         // add keyboard event
@@ -71,7 +71,7 @@
             var keyVal = e.keyCode;
             if(keyVal == 32){
                 if(!gameStatus){
-                    
+                    setTimeout(()=> instruction.style.opacity = "0" ,2000)
                     //start game
                     this.onmousemove = myPlaneMove;
                     //plane move
