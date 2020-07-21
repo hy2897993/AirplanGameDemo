@@ -23,6 +23,7 @@
     //enter game interface
     , gameStart = $("gameStart")
     , gameEnter = $("gameEnter")
+    , instruction = $("instruction")
     , myPlane = $("myplane")
     , bulletsP = $("bullets")
     , enemysP = $("enemys")
@@ -60,6 +61,7 @@
     gameStart.firstElementChild.onclick = function(){
         gameStart.style.display = "none";
         gameEnter.style.display = "block";
+	setTimeout(()=> instruction.style.opacity = "0" ,4000)
         //refresh score
         scores = 0;
         // add keyboard event
