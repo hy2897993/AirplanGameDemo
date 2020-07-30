@@ -61,6 +61,7 @@
     gameStart.firstElementChild.onclick = function(){
         gameStart.style.display = "none";
         gameEnter.style.display = "block";
+        
 
         //refresh score
         scores = 0;
@@ -71,6 +72,7 @@
             var keyVal = e.keyCode;
             if(keyVal == 32){
                 if(!gameStatus){
+                    
                     setTimeout(()=> instruction.style.opacity = "0" ,2000)
                     //start game
                     this.onmousemove = myPlaneMove;
@@ -298,15 +300,22 @@
         //get enemy data
         var enemyData = enemyObj["enemy"+enemyType];
         //create the enemy element
-        var enemy = new Image(enemyData.width,enemyData.height);
-        enemy.src = "image/enemy"+enemyType+".png"
+        // var enemy = new Image(enemyData.width,enemyData.height);
+        var enemy = document.createElement('div');
+        enemy.style.backgroundImage = "url('image/enemy"+ enemyType+".png')"
+        enemy.style.backgroundPosition = "center"
+        enemy.style.backgroundRepeat = "no-repeat"
+        enemy.style.backgroundSize= "contain"
+        enemy.style.width =enemyData.width+'px'
+        enemy.style.height =enemyData.width +'px'
+        // enemy.style.zIndex ='1003'
         enemy.t = enemyType;
         enemy.score = enemyData.score;
         enemy.hp = enemyData.hp;
         enemy.className = "e";
         enemy.dead = false;//enemy is alive
         //define the current position of enemy
-        var enemyT = Math.floor(Math.random()*(gameH-enemyData.height))
+        var enemyT = Math.floor(Math.random()*(gameH-enemyData.height)-(enemyData.width-enemyData.height)/2)
         ,   enemyL = gameW;
         enemy.style.left = enemyL +"px";
         enemy.style.top = enemyT +"px";
@@ -382,6 +391,7 @@
             var condition = bulletL + bulletW >= enemyL && bulletL <= enemyL + enemyW && bulletT <= enemyT + enemyH && bulletT + bulletH >= enemyT;
             if(condition){
                 //detect collision
+                bullets[i].src = "image/04bz.png";
                 //1,delete timer
                 clearInterval(bullets[i].timer);
                 //2,delete element
@@ -398,24 +408,24 @@
                     
                     
                     if (enemy.t==1){
-                        enemy.src = await "image/bz1.gif";
-                    enemy.style.transform='scaleY(2.768) translateY(-2px)';
+                        enemy.style.backgroundImage = await "url('image/bz1.gif')";
+                    // enemy.style.transform='scaleY(2.768) translateY(-2px)';
 
                     }else if(enemy.t==2){
-                        enemy.src = await "image/bz2.gif";
+                        enemy.style.backgroundImage  = await "url('image/bz2.gif')";
 
-                        enemy.style.transform='scaleY(2.768) translateY(-2px)';
+                        // enemy.style.transform='scaleY(2.768) translateY(-2px)';
 
                     }else if(enemy.t==3){
-                        enemy.src = await "image/bz3.gif";
+                        enemy.style.backgroundImage  = await "url('image/bz3.gif')";
 
-                        enemy.style.transform='scaleY(2.65) translateY(-16px)';
+                        // enemy.style.transform='scaleY(2.65) translateY(-16px)';
 
                     }
                     //3.mark dead enemy
                     setTimeout(() => {
                         enemy.dead = true;
-                    }, 1000);
+                    }, 500);
                     
                     //2.replace explosion gif
                     
