@@ -17,7 +17,7 @@
     height: 100%;
     background:url('image/ist.jpg');
     background-repeat: no-repeat;
-    position: relative;
+    position: absolute;
     display: block;
 }
 #starter:hover{
