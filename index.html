@@ -4,11 +4,13 @@
         <meta charset="UTF-8" />
         <title>Space War!</title>
         <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet"> 
+        
 
         <link rel="stylesheet" href="plane.css">
     </head>
     <body id="body">
         <div id="game">
+            
             <div id="gameStart">
                 <span id="starter">Start Game</span>
                 <!-- <span id="Setting">Setting</span>
@@ -17,9 +19,14 @@
 
             </div>
             <div id="gameEnter">
-                <div id="instruction"><b>Press "SPACE" Key To Start And Pause Game</b></div>
+                <audio controls loop src="./sounds/Lhomme_Manete_-_04_-_Space_Stage.mp3" style="display: none;" class="sound" id="openTrack"></audio>
+                <audio src="./sounds/338848__archeos__danger.wav" style="display: none;" class="sound" id="dangerSound"></audio>
+                <audio src="./sounds/344310__musiclegends__laser-shoot.wav" style="display: none;" class="sound" id="laserShoot"></audio>
+                <div id="instruction">
+                    <b>Press "SPACE" Key To Start And Pause Game</b></br>
+                    <b>Move Cursor And Left-click To Shoot</b>
+                </div>
                 <div id="myplane">
-                    <img  alt="">
                 </div>
                 <div id="bullets">
 
