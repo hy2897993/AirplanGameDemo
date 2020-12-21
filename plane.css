@@ -76,6 +76,9 @@
     left: 0;
     top: 0;
 }
+#bullets{
+    z-index:1;
+}
 
 .b{
     width: 18px;
