@@ -15,6 +15,14 @@
         }
         return parseFloat(res);
     }
+
+    //sound register
+    const openTrack = $('openTrack');
+    const dangerSound = $('dangerSound');
+    const laserShoot = $('laserShoot');
+    let bgmTime = 0;
+
+
     
     
 
@@ -34,8 +42,8 @@
     var gameW = getStyle(game,"width")
     ,gameH = getStyle(game,"height")
     //2.get game interface top&left margin
-    ,gameML = getStyle(game,"marginLeft")
-    ,gameMT = getStyle(game,"marginTop")
+    // ,gameML = getStyle(game,"marginLeft")
+    // ,gameMT = getStyle(game,"marginTop")
     //3.get myplane width&height
     ,myPlaneW = getStyle(myPlane,"width")
     ,myPlaneH = getStyle(myPlane,"height");
@@ -55,7 +63,14 @@
     ;
 
 
-
+    //shoot control
+    game.onclick = function(){
+        if(gameStatus){
+            laserShoot.currentTime = 0;
+            laserShoot.play();
+            createBullet();
+        }
+    }
 
     //start game
     gameStart.firstElementChild.onclick = function(){
@@ -67,12 +82,16 @@
         scores = 0;
         // add keyboard event
         document.onkeyup = function(evt){
+            
             var e = evt||window.event;
             //get key value
             var keyVal = e.keyCode;
             if(keyVal == 32){
                 if(!gameStatus){
-                    
+                    //bgm
+                    openTrack.currentTime = bgmTime;
+                    openTrack.play();
+
                     setTimeout(()=> instruction.style.opacity = "0" ,2000)
                     //start game
                     this.onmousemove = myPlaneMove;
@@ -81,7 +100,8 @@
                     //background move
                     bgMove();
                     //start shooting
-                    shot();
+                    // shoot();
+                    
                     //show enemy
                     appearEnemy();
                     //restart game after paused game
@@ -89,6 +109,11 @@
                     if(enemys.length != 0)restart(enemys);
 
                 }else{
+                    //bgm
+                    openTrack.pause();
+                    bgmTime = openTrack.currentTime;
+
+
                     this.onmousemove = null;
                     //stop enemys and bullets timer
                     clearInterval(a);
@@ -158,65 +183,7 @@
         myPlane.style.top = last_myPlane_top + 'px';
     }
 
-        
-        // myPlane.timer = setInterval(function () {
-        //     console.log('timer')
-            
-        //     if(last_myPlane_left>myPlane.style.left){
-        //         myPlane.style.left = myPlane.style.left+1+"px";
 
-        //     }
-        //     else if(last_myPlane_left<myPlane.style.left){
-        //         myPlane.style.left = myPlane.style.left-1+"px";
-
-        //     }else{
-        //         myPlane.style.left = myPlane.style.left+"px";
-        //     }
-        //     if(last_myPlane_top>myPlane.style.top){
-        //         myPlane.style.top = 1+myPlane.style.top+"px";
-
-        //     }
-        //     else if(last_myPlane_top<myPlane.style.top){
-        //         myPlane.style.top = myPlane.style.top-1+"px";
-
-        //     }else{
-        //         myPlane.style.top = myPlane.style.top+"px";
-        //     }
-        // },1000)
-        // if(myPlane.style.left == last_myPlane_left+"px"&&myPlane.style.top == last_myPlane_top+"px")
-        // {
-        //     clearInterval(myPlane.timer);
-        // }
-    
-    function sddvsd(last_myPlane_left,last_myPlane_top){
-        myPlane.timer = setInterval(function () {
-            var speed = 0.01;
-            if(last_myPlane_left>myPlane.style.left){
-                myPlane.style.left = speed+last_myPlane_left+"px";
-
-            }
-            else if(last_myPlane_left<myPlane.style.left){
-                myPlane.style.left = -speed+last_myPlane_left+"px";
-
-            }
-            if(last_myPlane_top>myPlane.style.top){
-                myPlane.style.top = speed+last_myPlane_top+"px";
-
-            }
-            else if(last_myPlane_top<myPlane.style.top){
-                myPlane.style.top = -speed+last_myPlane_top+"px";
-
-            }
-        },100)
-
-    }
-    // creat bullets timer
-    function shot(){
-        if(a) return;
-        a = setInterval(function(){
-            createBullet();
-        },500);
-    }
     //creat bullet
     function createBullet(){
         var bullet = new Image(18,9);
@@ -264,32 +231,42 @@
             width:120,
             height:36,
             score:100,
-            hp:100
+            hp:100,
+            fullHp:100
         },
         enemy2: {
             width:175,
             height:47,
             score:500,
-            hp:500
+            hp:500,
+            fullHp:500
         },
         enemy3: {
             width:467,
             height:150,
             score:1000,
-            hp:1000
+            hp:1000,
+            fullHp:1000
         }
     };
 
     //enemys timer
     function appearEnemy(){
         if(b) return;
+
+        dangerSound.currentTime = 0;
+        
+
+        A = setTimeout(function(){
+            dangerSound.play();
+        },3000)
+
         b = setInterval(function(){
         //creat enemy
         createEnemy();
         //delete dead enemy
         
         delEnemy();
-        
         },3000);
     }
     function createEnemy(){
@@ -308,10 +285,11 @@
         enemy.style.backgroundSize= "contain"
         enemy.style.width =enemyData.width+'px'
         enemy.style.height =enemyData.width +'px'
-        // enemy.style.zIndex ='1003'
+
         enemy.t = enemyType;
         enemy.score = enemyData.score;
         enemy.hp = enemyData.hp;
+        enemy.fullHp = enemyData.fullHp;
         enemy.className = "e";
         enemy.dead = false;//enemy is alive
         //define the current position of enemy
@@ -319,6 +297,24 @@
         ,   enemyL = gameW;
         enemy.style.left = enemyL +"px";
         enemy.style.top = enemyT +"px";
+
+        //why add p is slower than div?
+        var enemyHp = document.createElement('p');
+        enemyHp.style.width = "60%";
+        enemyHp.style.height = "10px";
+        enemyHp.style.top = "20%";//invisible ship??
+        enemyHp.style.border= "1px solid red";
+        enemyHp.style.margin= "auto";
+        enemyHp.style.display = "none";
+        enemyHp.style.position = "relative";
+
+        var enemyHpVal = document.createElement('p');
+        enemyHpVal.style.width = "100%";
+        enemyHpVal.style.height = "10px";
+        enemyHpVal.style.background= "red";
+        
+        enemy.appendChild(enemyHp);
+        enemyHp.appendChild(enemyHpVal);
         enemysP.appendChild(enemy);
         enemys.push(enemy);
         enemyMove(enemy,"left");
@@ -388,19 +384,50 @@
 
             var enemyW = getStyle(enemy,'width')
             ,   enemyH = getStyle(enemy,'height');
-            var condition = bulletL + bulletW >= enemyL && bulletL <= enemyL + enemyW && bulletT <= enemyT + enemyH && bulletT + bulletH >= enemyT;
+            var condition = bulletL + bulletW >= enemyL && 
+                            bulletL <= enemyL + enemyW && 
+                            bulletT <= enemyT + 0.7 * enemyH && //scale down the effective height
+                            bulletT + bulletH >= enemyT + 0.3 * enemyH;
             if(condition){
                 //detect collision
-                bullets[i].src = "image/04bz.png";
+
+
+                //bullets[i].src = "image/bz01.png";//??fix it
+                let spark = document.createElement("div");
+                spark.style.width = "25px";
+                spark.style.height = "25px";
+                spark.style.position = "absolute";
+                spark.style.backgroundImage = "url(image/bz01.png)";
+                spark.style.backgroundSize = "contain";
+                spark.style.left = (bulletL-12.5+bulletW/2)+"px";
+                spark.style.top = (bulletT-12.5+bulletH/2)+"px";
+                bulletsP.appendChild(spark);
+
+                setTimeout(()=> bulletsP.removeChild(spark), 500);
+
                 //1,delete timer
                 clearInterval(bullets[i].timer);
+                
+                
                 //2,delete element
                 bulletsP.removeChild(bullets[i]);
                 //3,remove from array
                 bullets.splice(i,1);
+                
+                
                 //4.test hp
                 
                 enemy.hp-=100;
+                
+                //show hp value
+                var hpObjs = enemy.getElementsByTagName("p")
+                hpObjs[0].style.display = "block";
+                hpObjs[1].style.width = 100* enemy.hp/enemy.fullHp +"%";
+                // enemyHpVal.style.height = "10px";
+                // enemyHpVal.style.background= "red";
+        
+                
+
                 if(enemy.hp==0){
                     //1.timer
                     clearInterval(enemy.timer);
@@ -466,7 +493,10 @@
                 ;
                 var myPlaneL = getStyle(myPlane,"left")
 				,	myPlaneT = getStyle(myPlane,"top");
-                var condition = myPlaneL + myPlaneW >= enemyL && myPlaneL <= enemyL + enemyW && myPlaneT <= enemyT + enemyH && myPlaneT + myPlaneH >= enemyT;
+                var condition = myPlaneL + myPlaneW >= enemyL && 
+                                myPlaneL <= enemyL + enemyW 
+                                && myPlaneT <= enemyT + 0.7 * enemyH 
+                                && myPlaneT + myPlaneH >= enemyT + 0.3 * enemyH;
                 if(condition){
                     //1.clear all timer
                     clearInterval(a);
@@ -483,13 +513,17 @@
                     enemys=[];
                     //clear myplane movement
                     document.onmousemove=null;
+
+                    bgmTime = 0;
+                    openTrack.pause();
+                    
                     alert("Game over: " + scores + "points");
                     //return to first page
                     gameEnter.style.display="none";
                     gameStart.style.display="block";
 
-                    myPlane.style.left = "127px";
-					myPlane.style.top = gameH - myPlaneH + "px";
+                    gameStatus = false;
+                    instruction.style.opacity = "1";
 
 
                 }
