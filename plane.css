@@ -17,9 +17,7 @@
     height: 100%;
     background:url('image/ist.jpg');
     background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    position: absolute;
+    position: relative;
     display: block;
 }
 #starter:hover{
@@ -66,7 +64,6 @@
     background-size: cover;
     left: 50%;
     top: 90%;
-    cursor: pointer;
 }
 
 #bullets,#enemys{
@@ -77,10 +74,10 @@
     top: 0;
 }
 #bullets{
-    z-index:1;
+    z-index: 1;
 }
 
-.b{
+.b, .eb{
     width: 18px;
     height: 9px;
     position: absolute;
