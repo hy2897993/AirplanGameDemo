@@ -1,3 +1,5 @@
+
+
 ;window.onload = function(){
     //get element method
     //so brilliant!!
@@ -34,6 +36,7 @@
     , instruction = $("instruction")
     , myPlane = $("myplane")
     , bulletsP = $("bullets")
+    , enemyBulletsP = $("enemyBullets")
     , enemysP = $("enemys")
     , s=$("scores").firstElementChild.firstElementChild;
     //get all elements
@@ -49,7 +52,9 @@
     ,myPlaneH = getStyle(myPlane,"height");
     //4.bullet w&height
     var bulletW = 14
-    ,   bulletH = 6; 
+    ,   bulletH = 6 
+    ,   eBulletW = 18
+    ,   eBulletH = 9;
      
     //globe variables
     var gameStatus = false
@@ -58,6 +63,7 @@
     ,   c = null //background image clock
     ,   backgroundPX = 0 //background Y value
     ,   bullets = []//all bullet elements
+    ,   enemyBullets = []// all enemy bullets
     ,   enemys = []//all enemy elements
     ,   scores = 0;
     ;
@@ -106,7 +112,9 @@
                     appearEnemy();
                     //restart game after paused game
                     if(bullets.length != 0) restart(bullets,1);
-                    if(enemys.length != 0)restart(enemys);
+                    if(enemyBullets.length != 0) restart(enemyBullets,2);
+                    if(enemys.length != 0) restart(enemys);
+                    
 
                 }else{
                     //bgm
@@ -123,8 +131,11 @@
                     b = null;
                     c = null;
                     //clear all bullet and enemy timers
+                    //movement
                     clear(bullets);
                     clear(enemys);
+                    clear(enemyBullets);
+
                 }
                 gameStatus = !gameStatus;
             }
@@ -184,9 +195,10 @@
     }
 
 
+
     //creat bullet
     function createBullet(){
-        var bullet = new Image(18,9);
+        var bullet = new Image(bulletW,bulletH);
         bullet.src = "image/04.png";
         // bullet.style.mixBlendMode='multiply';
         bullet.className = "b";
@@ -203,22 +215,21 @@
         bullet.style.top = bulletT+"px";
         bulletsP.appendChild(bullet);
         bullets.push(bullet);
-        move(bullet,"left");
+        move(bullet,"left", 8, bullets);
         }
     //bullet movement
-    function move(ele,attr){
-            var speed = 8;
+    function move(ele, attr, speed, objType){
             ele.timer = setInterval(function(){
                 var moveVal = getStyle(ele,attr);
                 
                 //bullet move out of interface, delete timer and bullet
-                if(moveVal >= gameW ){
+                if(moveVal >= gameW || moveVal <= 0){
                     
                     
                     clearInterval(ele.timer);
                     ele.parentNode.removeChild(ele);
-                    bullets.splice(0,1);
                     
+                    objType.splice(0,1);
                 }else{
                     ele.style[attr]=moveVal+speed+"px";
                 }
@@ -239,14 +250,16 @@
             height:47,
             score:500,
             hp:500,
-            fullHp:500
+            fullHp:500,
+            attack: true
         },
         enemy3: {
             width:467,
             height:150,
             score:1000,
             hp:1000,
-            fullHp:1000
+            fullHp:1000,
+            attack: true
         }
     };
 
@@ -271,7 +284,11 @@
     }
     function createEnemy(){
         //different enemys' chances
-        var percentData=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,3];
+        var percentData=[
+            1,1,1,1,1,1,1,1,1,1,
+            2,2,2,2,
+            3,3
+        ];
         //type of enemy
         var enemyType = percentData[Math.floor(Math.random()*percentData.length)];
         //get enemy data
@@ -326,6 +343,8 @@
             speed = -1.5;
         }else if(ele.t == 2){
             speed = -1;
+            //create bullet
+            ele.bulletTimer = setInterval(()=>createEnemyBullet(ele), 2000);
         }else if(ele.t == 3){
             speed = -0.5;
         }
@@ -345,16 +364,87 @@
             }
         },10)
     }
+
+    function createEnemyBullet(enemyObj){
+        var bullet = new Image(eBulletW,eBulletH);
+        bullet.src = "image/enemyBullet.png";
+        // bullet.style.mixBlendMode='multiply';
+        bullet.className = "eb";
+
+        //plane current location
+        var enemyObjL = getStyle(enemyObj,"left")
+        ,   enemyObjT = getStyle(enemyObj,"top")
+        ,   enemyObjH = getStyle(enemyObj,"height");
+
+        //bullet location
+        var bulletT = enemyObjT+enemyObjH/2-bulletH/2
+        ,   bulletL = enemyObjL-bulletW;
+
+        bullet.style.left = bulletL+"px";
+        bullet.style.top = bulletT+"px";
+        enemyBulletsP.appendChild(bullet);
+        enemyBullets.push(bullet);
+        move(bullet,"left", -8, enemyBullets);
+    }
+
+    function createGroupBullets(enemyObj){
+        var scapeIndex = Math.floor(Math.random() * 7) + 1;
+        var enemyObjL = getStyle(enemyObj,"left");
+        var enemyObjW = getStyle(enemyObj,"width");
+        var gameH = getStyle(game, "height");
+        var bulletL = enemyObjL + enemyObjW/5;
+
+        let index = 1;
+        for(let i = 0; i < 6; i++){
+            
+            if(index == scapeIndex){
+                index += 3;
+            }
+            var bullet = new Image(eBulletW,eBulletH);
+            var bulletT = (index * (gameH/10))-bulletH/2;
+
+            bullet.src = "image/enemyBullet.png";
+            bullet.className = "eb";
+            bullet.style.left = bulletL + "px";
+            bullet.style.top = bulletT + "px";
+            enemyBulletsP.appendChild(bullet);
+            enemyBullets.push(bullet);
+            move(bullet,"left", -4, enemyBullets);
+
+            index++;
+        }
+    }
+
     //clear enemy and bullet movement timer
     function clear(childs){
-        for(var i = 0;i<childs.length;i++){
-            clearInterval(childs[i].timer);
+        if(childs == enemys){
+            for(var i = 0;i<childs.length;i++){
+                clearInterval(childs[i].timer);
+                clearInterval(childs[i].bulletTimer);
+            }
+        }else{
+            for(var i = 0;i<childs.length;i++){
+                clearInterval(childs[i].timer);
+            }
         }
+        
     }
     //restart paused bullets and enemys
     function restart(childs,type){
         for(var i = 0;i<childs.length;i++){
-            type == 1 ? move(childs[i],"top") : enemyMove(childs[i],"top");
+            // ele, attr, speed, objType
+            switch (type) {
+                case 1:
+                    move(childs[i],"left", 8, bullets);
+                    break;
+                case 2:
+                    move(childs[i],"left", -8, enemyBullets);
+                    break;
+            
+                default:
+                    enemyMove(childs[i],"left");
+                    break;
+            }
     }}
 
     //background image movement
@@ -429,26 +519,14 @@
                 
 
                 if(enemy.hp==0){
+                    if(enemy.t == 3){
+                        createGroupBullets(enemy);
+                    }
                     //1.timer
                     clearInterval(enemy.timer);
                      
-                    
-                    
-                    if (enemy.t==1){
-                        enemy.style.backgroundImage = await "url('image/bz1.gif')";
-                    // enemy.style.transform='scaleY(2.768) translateY(-2px)';
+                    enemy.style.backgroundImage = await "url('image/bz"+ enemy.t+".gif')";
 
-                    }else if(enemy.t==2){
-                        enemy.style.backgroundImage  = await "url('image/bz2.gif')";
-
-                        // enemy.style.transform='scaleY(2.768) translateY(-2px)';
-
-                    }else if(enemy.t==3){
-                        enemy.style.backgroundImage  = await "url('image/bz3.gif')";
-
-                        // enemy.style.transform='scaleY(2.65) translateY(-16px)';
-
-                    }
                     //3.mark dead enemy
                     setTimeout(() => {
                         enemy.dead = true;
@@ -484,51 +562,70 @@
     }
     //collision my plan
     function gameover(){
-        for(var i=0;i<enemys.length;i++){
+        var myPlaneL = getStyle(myPlane,"left")
+        ,	myPlaneT = getStyle(myPlane,"top");
+        
+        for(let i = 0; i < enemyBullets.length; i++){
+            let eBulletL = getStyle(enemyBullets[i], "left")
+            ,   eBulletR = getStyle(enemyBullets[i], "right")
+            ,   eBulletT = getStyle(enemyBullets[i], "top")
+            ,   eBulletB = getStyle(enemyBullets[i], "bootom");
+
+            let condition = myPlaneL + myPlaneW >= eBulletL && 
+                            myPlaneL <= eBulletL + eBulletW && 
+                            myPlaneT <= eBulletT + 0.5 * eBulletH && 
+                            myPlaneT + myPlaneH >= eBulletT + 0.5 * eBulletH; 
+            if(condition){
+                realGameOver();
+            }
+        }
+        for(let i=0;i<enemys.length;i++){
             if(!enemys[i].dead){
                 var enemyL = getStyle(enemys[i],"left")
                 ,   enemyT = getStyle(enemys[i],"top")
                 ,   enemyW = getStyle(enemys[i],"width")
                 ,   enemyH = getStyle(enemys[i],"height")
                 ;
-                var myPlaneL = getStyle(myPlane,"left")
-				,	myPlaneT = getStyle(myPlane,"top");
+                
                 var condition = myPlaneL + myPlaneW >= enemyL && 
                                 myPlaneL <= enemyL + enemyW 
                                 && myPlaneT <= enemyT + 0.7 * enemyH 
                                 && myPlaneT + myPlaneH >= enemyT + 0.3 * enemyH;
                 if(condition){
-                    //1.clear all timer
-                    clearInterval(a);
-                    a=null;
-                    clearInterval(b);
-                    b=null;
-                    clearInterval(c);
-                    c=null;
-                    //clear elements
-                    remove(bullets);
-                    remove(enemys);
-                    //clear arrays
-                    bullets=[];
-                    enemys=[];
-                    //clear myplane movement
-                    document.onmousemove=null;
-
-                    bgmTime = 0;
-                    openTrack.pause();
-                    
-                    alert("Game over: " + scores + "points");
-                    //return to first page
-                    gameEnter.style.display="none";
-                    gameStart.style.display="block";
-
-                    gameStatus = false;
-                    instruction.style.opacity = "1";
-
-
+                    realGameOver();
                 }
             }
         }
+    }
+    function realGameOver(){
+         //1.clear all timer
+         clearInterval(a);
+         a=null;
+         clearInterval(b);
+         b=null;
+         clearInterval(c);
+         c=null;
+         //clear elements
+         remove(bullets);
+         remove(enemys);
+         //clear arrays
+         bullets=[];
+         enemys=[];
+         enemyBullets = [];
+         //clear myplane movement
+         document.onmousemove=null;
+
+         bgmTime = 0;
+         openTrack.pause();
+         
+         alert("Game over: " + scores + "points");
+         //return to first page
+         gameEnter.style.display="none";
+         gameStart.style.display="block";
+
+         gameStatus = false;
+         instruction.style.opacity = "1";
+
     }
     function remove(children){
         for(var i=children.length-1;i>=0;i--){
