@@ -1,5 +1,3 @@
-
-
 ;window.onload = function(){
     //get element method
     //so brilliant!!
@@ -23,10 +21,7 @@
     const dangerSound = $('dangerSound');
     const laserShoot = $('laserShoot');
     let bgmTime = 0;
-
-
-    
-    
+ 
 
     //start game interface
     var game = $("game")
@@ -193,8 +188,6 @@
         myPlane.style.left = last_myPlane_left + 'px';
         myPlane.style.top = last_myPlane_top + 'px';
     }
-
-
 
     //creat bullet
     function createBullet(){
