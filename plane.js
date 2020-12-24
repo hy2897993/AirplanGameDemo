@@ -1,3 +1,5 @@
+
+
 ;window.onload = function(){
     //get element method
     //so brilliant!!
@@ -21,7 +23,10 @@
     const dangerSound = $('dangerSound');
     const laserShoot = $('laserShoot');
     let bgmTime = 0;
- 
+
+
+    
+    
 
     //start game interface
     var game = $("game")
@@ -53,7 +58,7 @@
      
     //globe variables
     var gameStatus = false
-    ,   a = null //bullet clock
+    ,   a = null //danger sound
     ,   b = null //creat enemy clock
     ,   c = null //background image clock
     ,   backgroundPX = 0 //background Y value
@@ -189,6 +194,67 @@
         myPlane.style.top = last_myPlane_top + 'px';
     }
 
+        
+        // myPlane.timer = setInterval(function () {
+        //     console.log('timer')
+            
+        //     if(last_myPlane_left>myPlane.style.left){
+        //         myPlane.style.left = myPlane.style.left+1+"px";
+
+        //     }
+        //     else if(last_myPlane_left<myPlane.style.left){
+        //         myPlane.style.left = myPlane.style.left-1+"px";
+
+        //     }else{
+        //         myPlane.style.left = myPlane.style.left+"px";
+        //     }
+        //     if(last_myPlane_top>myPlane.style.top){
+        //         myPlane.style.top = 1+myPlane.style.top+"px";
+
+        //     }
+        //     else if(last_myPlane_top<myPlane.style.top){
+        //         myPlane.style.top = myPlane.style.top-1+"px";
+
+        //     }else{
+        //         myPlane.style.top = myPlane.style.top+"px";
+        //     }
+        // },1000)
+        // if(myPlane.style.left == last_myPlane_left+"px"&&myPlane.style.top == last_myPlane_top+"px")
+        // {
+        //     clearInterval(myPlane.timer);
+        // }
+    /*
+    function sddvsd(last_myPlane_left,last_myPlane_top){
+        myPlane.timer = setInterval(function () {
+            var speed = 0.01;
+            if(last_myPlane_left>myPlane.style.left){
+                myPlane.style.left = speed+last_myPlane_left+"px";
+
+            }
+            else if(last_myPlane_left<myPlane.style.left){
+                myPlane.style.left = -speed+last_myPlane_left+"px";
+
+            }
+            if(last_myPlane_top>myPlane.style.top){
+                myPlane.style.top = speed+last_myPlane_top+"px";
+
+            }
+            else if(last_myPlane_top<myPlane.style.top){
+                myPlane.style.top = -speed+last_myPlane_top+"px";
+
+            }
+        },100)
+
+    }
+    */
+    // creat bullets timer
+  
+        
+        // if(a) return;
+        // a = setInterval(function(){
+        //     createBullet();
+        // },500);
+
     //creat bullet
     function createBullet(){
         var bullet = new Image(bulletW,bulletH);
@@ -263,16 +329,16 @@
         dangerSound.currentTime = 0;
         
 
-        A = setTimeout(function(){
+        a = setTimeout(function(){
             dangerSound.play();
         },3000)
 
         b = setInterval(function(){
-        //creat enemy
-        createEnemy();
-        //delete dead enemy
-        
-        delEnemy();
+            //creat enemy
+            createEnemy();
+            //delete dead enemy
+            
+            delEnemy();
         },3000);
     }
     function createEnemy(){
@@ -359,6 +425,7 @@
     }
 
     function createEnemyBullet(enemyObj){
+        console.log(enemyObj);
         var bullet = new Image(eBulletW,eBulletH);
         bullet.src = "image/enemyBullet.png";
         // bullet.style.mixBlendMode='multiply';
@@ -410,17 +477,12 @@
 
     //clear enemy and bullet movement timer
     function clear(childs){
-        if(childs == enemys){
-            for(var i = 0;i<childs.length;i++){
-                clearInterval(childs[i].timer);
+        for(var i = 0;i<childs.length;i++){
+            clearInterval(childs[i].timer);
+            if(childs[i].bulletTimer){
                 clearInterval(childs[i].bulletTimer);
             }
-        }else{
-            for(var i = 0;i<childs.length;i++){
-                clearInterval(childs[i].timer);
-            }
-        }
-        
+        } 
     }
     //restart paused bullets and enemys
     function restart(childs,type){
@@ -509,11 +571,13 @@
                 // enemyHpVal.style.height = "10px";
                 // enemyHpVal.style.background= "red";
         
-                
 
                 if(enemy.hp==0){
                     if(enemy.t == 3){
                         createGroupBullets(enemy);
+                    }
+                    if(enemy.t == 2){
+                        clearInterval(enemy.bulletTimer);
                     }
                     //1.timer
                     clearInterval(enemy.timer);
@@ -598,9 +662,10 @@
          b=null;
          clearInterval(c);
          c=null;
-         //clear elements
+         //clear elements timer
          remove(bullets);
          remove(enemys);
+         remove(enemyBullets);
          //clear arrays
          bullets=[];
          enemys=[];
