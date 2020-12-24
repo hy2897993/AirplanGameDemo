@@ -425,7 +425,6 @@
     }
 
     function createEnemyBullet(enemyObj){
-        console.log(enemyObj);
         var bullet = new Image(eBulletW,eBulletH);
         bullet.src = "image/enemyBullet.png";
         // bullet.style.mixBlendMode='multiply';
